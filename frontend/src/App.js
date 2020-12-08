@@ -38,7 +38,7 @@ function App() {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3000/signin', {
+      const response = await fetch('https://infinite-wave-73400.herokuapp.com/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ function App() {
       const responseData = await response.json(); //token
       setToken(responseData.token);
       if (!responseData.error) {
-        const response = await fetch('http://localhost:3000/profile', {
+        const response = await fetch('https://infinite-wave-73400.herokuapp.com/profile', {
           method: 'GET',
           headers: {
             'auth-token': responseData.token,

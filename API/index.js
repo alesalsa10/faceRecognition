@@ -26,6 +26,9 @@ mongoose.connect(
   () => console.log('Conntected to db')
 );
 
+
+app.get('/', (req, res) => {res.send('it is working!')})
+
 //the path is already created on auth.js with router
 app.use('/', authRoutes);
 
@@ -33,5 +36,6 @@ app.use('/', authRoutes);
 app.use('/', tokenValidation, homeRoute);
 app.use('/', tokenValidation, updateEntriesRoute);
 
-app.listen(process.env.PORT || 3000);
-
+app.listen(process.env.PORT || 3000, function(){
+  console.log(`App is running on port ${process.env.PORT}`);
+});

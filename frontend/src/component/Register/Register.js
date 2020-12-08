@@ -17,7 +17,7 @@ export default function Register({ onRouteChange }) {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3000/register', {
+      const response = await fetch('https://infinite-wave-73400.herokuapp.com/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
