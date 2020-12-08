@@ -33,5 +33,5 @@ app.use('/', authRoutes);
 app.use('/', tokenValidation, homeRoute);
 app.use('/', tokenValidation, updateEntriesRoute);
 
-app.listen(3000, () => console.log('server is running...'));
+app.listen(process.env.PORT || 3000);
 
