@@ -41,7 +41,7 @@ function App() {
       const response = await fetch('https://infinite-wave-73400.herokuapp.com/signin', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           email,

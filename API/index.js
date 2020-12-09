@@ -5,10 +5,10 @@ const tokenValidation = require('./routes/token-validation');
 const cors = require('cors');
 const config = require('config');
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-;
+
 
 const authRoutes = require('./routes/auth');
 const homeRoute = require('./routes/user');
