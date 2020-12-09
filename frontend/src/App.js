@@ -106,7 +106,7 @@ function App() {
       }
     );
     try{
-      const response = await fetch('http://localhost:3000/' + userData._id, {
+      const response = await fetch('https://infinite-wave-73400.herokuapp.com/' + userData._id, {
         method: 'PUT',
         headers: {
           'auth-token': token,

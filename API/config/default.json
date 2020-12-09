@@ -1,0 +1,4 @@
+{
+    "DB_CONNECT": "mongodb+srv://Am0955667:Am0955667@facerecognition.bdwjk.mongodb.net/<dbname>?retryWrites=true&w=majority",
+    "TOKEN_SECRET": "tokensecretkey"
+}

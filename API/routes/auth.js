@@ -3,9 +3,10 @@ const User = require('../Models/User');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
+const config = require('config');
+//const dotenv = require('dotenv');
 
-dotenv.config();
+//dotenv.config();
 
 router.post(
   '/register',
@@ -40,7 +41,7 @@ router.post(
       };
 
       //token to be sent in the header to access authenticated routes
-      jwt.sign(payload, process.env.TOKEN_SECRET, (err, token) => {
+      jwt.sign(payload, config.get('TOKEN_SECRET'), (err, token) => {
         if (err) throw err;
         res.json({ token });
       });
@@ -85,7 +86,7 @@ router.post(
     //token to be sent in the header to access authenticated routes
     jwt.sign(
       payload,
-      process.env.TOKEN_SECRET,
+      config.get('TOKEN_SECRET'),
       //{ expiresIn: 3600 },
       (err, token) => {
         if (err) throw err;

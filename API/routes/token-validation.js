@@ -1,8 +1,7 @@
 const jwt = require('jsonwebtoken');
-const dotent = require('dotenv');
 const { restart } = require('nodemon');
+const config = require('config');
 
-dotent.config();
 
 //middleware to validate token
 const verifyToken = (req, res, next) => {
@@ -10,7 +9,7 @@ const verifyToken = (req, res, next) => {
   if (!token) return res.status(401).json({ error: 'Access denied' });
 
   try {
-    const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+    const verified = jwt.verify(token, config.get('TOKEN_SECRET'));
     req.user = verified;
     next();
   } catch (error) {
