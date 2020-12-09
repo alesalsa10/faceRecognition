@@ -4,9 +4,7 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-//const dotenv = require('dotenv');
 
-//dotenv.config();
 
 router.post(
   '/register',

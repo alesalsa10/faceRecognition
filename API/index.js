@@ -1,18 +1,13 @@
 const express = require('express');
-const app = express();
-const mongoose = require('mongoose');
-const tokenValidation = require('./routes/token-validation');
 const cors = require('cors');
+const tokenValidation = require('./routes/token-validation');
+const mongoose = require('mongoose');
 const config = require('config');
+
+const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-
-
-const authRoutes = require('./routes/auth');
-const homeRoute = require('./routes/user');
-const updateEntriesRoute = require('./routes/updateEntries');
 
 //connect to db
 mongoose.connect(
@@ -25,6 +20,10 @@ mongoose.connect(
   },
   () => console.log('Conntected to db')
 );
+
+const authRoutes = require('./routes/auth');
+const homeRoute = require('./routes/user');
+const updateEntriesRoute = require('./routes/updateEntries');
 
 
 app.get('/', (req, res) => {res.send('it is working!')})
