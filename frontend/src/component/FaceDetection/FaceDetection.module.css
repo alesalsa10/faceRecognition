@@ -2,7 +2,6 @@
   margin-top: 1rem;
   display: flex;
   justify-content: center;
-  
 }
 img {
   width: 500px;
@@ -25,6 +24,12 @@ img {
   cursor: pointer;
 }
 
-.imgSubDiv{
+.imgSubDiv {
   position: absolute;
+}
+
+.noFacesMessage {
+  color: red;
+  margin-top: 1rem;
+  font-size: larger;
 }

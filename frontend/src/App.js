@@ -10,7 +10,6 @@ import FaceDetection from './component/FaceDetection/FaceDetection';
 import SignIn from './component/SignIn/SignIn';
 import Register from './component/Register/Register';
 
-
 function App() {
   const app = new Clarifai.App({
     apiKey: '91db33c5ded04e58a28cf9ca717157f0',
@@ -28,6 +27,8 @@ function App() {
   const [route, setRoute] = useState('signIn');
   const [isSignedIn, setSignedIn] = useState(false);
   const [token, setToken] = useState('');
+  const [recognitionError, setRecognitionError] = useState('');
+  const [message, setMessage] = useState('');
 
   const { email, password } = formData;
 
@@ -38,29 +39,34 @@ function App() {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://infinite-wave-73400.herokuapp.com/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      const response = await fetch(
+        'https://infinite-wave-73400.herokuapp.com/signin',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
       const responseData = await response.json(); //token
       setToken(responseData.token);
       if (!responseData.error) {
-        const response = await fetch('https://infinite-wave-73400.herokuapp.com/profile', {
-          method: 'GET',
-          headers: {
-            'auth-token': responseData.token,
-          },
-        });
+        const response = await fetch(
+          'https://infinite-wave-73400.herokuapp.com/profile',
+          {
+            method: 'GET',
+            headers: {
+              'auth-token': responseData.token,
+            },
+          }
+        );
         const user = await response.json();
         setUserData(user);
         onRouteChange('home');
-
       } else {
         setError(responseData.error);
       }
@@ -89,6 +95,7 @@ function App() {
 
   const displayFaceBox = (boxes) => {
     setBoxes(boxes);
+    console.log(boxes);
   };
 
   const onInputChange = (e) => {
@@ -99,31 +106,42 @@ function App() {
     setUrl(input);
     app.models.predict(Clarifai.FACE_DETECT_MODEL, input).then(
       function (response) {
-        displayFaceBox(calculateFaceLocation(response));
+        let responseObj = response.outputs[0].data;
+
+        if (Object.keys(responseObj).length !== 0) {
+          displayFaceBox(calculateFaceLocation(response));
+          setMessage('');
+        } else {
+          setBoxes([]);
+          setMessage('No faces found');
+        }
       },
       function (err) {
         console.log(err);
+        setRecognitionError('Something went wrong, try again later');
       }
     );
-    try{
-      const response = await fetch('https://infinite-wave-73400.herokuapp.com/' + userData._id, {
-        method: 'PUT',
-        headers: {
-          'auth-token': token,
-        },
-      })
+    try {
+      const response = await fetch(
+        'https://infinite-wave-73400.herokuapp.com/' + userData._id,
+        {
+          method: 'PUT',
+          headers: {
+            'auth-token': token,
+          },
+        }
+      );
       const updatedUser = await response.json();
-      setUserData({...userData, entries: updatedUser.entries})
-
-    } catch(err){
-      console.log(err)
+      setUserData({ ...userData, entries: updatedUser.entries });
+    } catch (err) {
+      console.log(err);
     }
   };
 
   const onRouteChange = (route) => {
     if (route === 'signOut') {
       setSignedIn(false);
-      setFormData({email: '', password: ''})
+      setFormData({ email: '', password: '' });
     } else if (route === 'home') {
       setSignedIn(true);
     }
@@ -156,7 +174,12 @@ function App() {
             onInputChange={onInputChange}
             onButtonSubmit={onSubmit}
           />
-          <FaceDetection boxes={boxes} url={url} />
+          <FaceDetection
+            boxes={boxes}
+            url={url}
+            recognitionError={recognitionError}
+            message={message}
+          />
         </div>
       ) : route === 'signIn' ? (
         <SignIn
