@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from './Register.module.css';
+import Loader from 'react-loader-spinner';
 
 export default function Register({ onRouteChange }) {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ export default function Register({ onRouteChange }) {
   });
   const [error, setError] = useState('');
   const { name, email, password } = formData;
+  const [isLoading, setIsLoading] = useState(false);
 
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,20 +18,23 @@ export default function Register({ onRouteChange }) {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      const response = await fetch('https://infinite-wave-73400.herokuapp.com/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
-      });
+      const response = await fetch(
+        'https://infinite-wave-73400.herokuapp.com/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+          }),
+        }
+      );
       const responseData = await response.json(); //token
-      console.log(responseData);
       if (!responseData.errors) {
         onRouteChange('signIn');
       } else {
@@ -68,12 +73,14 @@ export default function Register({ onRouteChange }) {
           value={password}
           onChange={onChangeHandler}
         />
-        <input
+        {
+          isLoading === false || error !== '' ? <input
           type='submit'
           name=''
           value='Register'
           onClick={onSubmitHandler}
-        />
+        /> : <Loader type='ThreeDots' color='#ff267e' />
+        }
         <p onClick={() => onRouteChange('signIn')}>Sign In</p>
         {error && <div className={styled.error}>{error}</div>}
       </form>

@@ -123,6 +123,7 @@ function App() {
   const onRouteChange = (route) => {
     if (route === 'signOut') {
       setSignedIn(false);
+      setFormData({email: '', password: ''})
     } else if (route === 'home') {
       setSignedIn(true);
     }

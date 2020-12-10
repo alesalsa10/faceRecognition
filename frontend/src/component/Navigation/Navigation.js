@@ -6,7 +6,7 @@ export default function Navigation({ onRouteChange, isSignedIn }) {
     return (
       <nav className={styled.navigationLink}>
         <p
-          onClick={() => onRouteChange('signIn')}
+          onClick={() => onRouteChange('signOut')}
           className={styled.signInOut}
         >
           Sign Out
