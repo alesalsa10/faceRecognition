@@ -6,7 +6,7 @@
     border-radius: 10px;
     box-sizing: border-box;
     background: rgba(0,0,0,.2);
-    margin-bottom: 1rem;
+    margin-top: 3rem;
 }
 
 
@@ -29,7 +29,8 @@ h2{
     margin-bottom: 20px;
 }
 
-.loginBox input[type="text"],
+.loginBox input[type="email"],
+.loginBox input[type='text'],
 .loginBox input[type="password"]{
     border: none;
     border-bottom: 1px solid #fff;

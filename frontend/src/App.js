@@ -1,79 +1,47 @@
+import { useState, useCallback, Fragment } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from 'react-router-dom';
 import Navigation from './component/Navigation/Navigation';
 import Logo from './component/Logo/Logo';
 import ImageLinkForm from './component/ImageLinkForm/ImageLinkForm';
 import Rank from './component/Rank/Rank';
 import Particles from 'react-particles-js';
 import './App.css';
-import { useState } from 'react';
 import Clarifai from 'clarifai';
 import FaceDetection from './component/FaceDetection/FaceDetection';
 import SignIn from './component/SignIn/SignIn';
 import Register from './component/Register/Register';
+import { AuthContext } from './context/authContext';
 
 function App() {
   const app = new Clarifai.App({
     apiKey: '91db33c5ded04e58a28cf9ca717157f0',
   });
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
   const [userData, setUserData] = useState('');
   const [input, setInput] = useState('');
   const [url, setUrl] = useState('');
   const [boxes, setBoxes] = useState([]);
-  const [route, setRoute] = useState('signIn');
-  const [isSignedIn, setSignedIn] = useState(false);
   const [token, setToken] = useState('');
   const [recognitionError, setRecognitionError] = useState('');
   const [message, setMessage] = useState('');
+  const [userID, setUserID] = useState();
 
-  const { email, password } = formData;
+  const login = useCallback((token) => {
+    setToken(token);
+  }, []);
 
-  const onChangeHandler = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const logout = useCallback(() => {
+    setToken(null);
+  }, []);
 
-  const onSubmitHandler = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(
-        'https://infinite-wave-73400.herokuapp.com/signin',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
-      const responseData = await response.json(); //token
-      setToken(responseData.token);
-      if (!responseData.error) {
-        const response = await fetch(
-          'https://infinite-wave-73400.herokuapp.com/profile',
-          {
-            method: 'GET',
-            headers: {
-              'auth-token': responseData.token,
-            },
-          }
-        );
-        const user = await response.json();
-        setUserData(user);
-        onRouteChange('home');
-      } else {
-        setError(responseData.error);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const getUserID = useCallback((id) => {
+    setUserID(id)
+  }, [])
 
   const calculateFaceLocation = (data) => {
     const clarifaiFaces = data.outputs[0].data.regions.map(
@@ -95,7 +63,6 @@ function App() {
 
   const displayFaceBox = (boxes) => {
     setBoxes(boxes);
-    console.log(boxes);
   };
 
   const onInputChange = (e) => {
@@ -122,12 +89,13 @@ function App() {
       }
     );
     try {
+      console.log(token);
       const response = await fetch(
-        'https://infinite-wave-73400.herokuapp.com/' + userData._id,
+        'https://infinite-wave-73400.herokuapp.com/' + userID,
         {
           method: 'PUT',
           headers: {
-            'auth-token': token,
+            'auth-token': token.token,
           },
         }
       );
@@ -138,62 +106,79 @@ function App() {
     }
   };
 
-  const onRouteChange = (route) => {
-    if (route === 'signOut') {
-      setSignedIn(false);
-      setFormData({ email: '', password: '' });
-    } else if (route === 'home') {
-      setSignedIn(true);
-    }
-    setRoute(route);
-  };
+  let routes;
+
+  if (token) {
+    routes = (
+      <Fragment>
+        <Navigation />
+        <Route
+          exact
+          path='/home'
+          render={() => (
+            <Fragment>
+              <Logo />
+              <Rank />
+              <ImageLinkForm
+                onInputChange={onInputChange}
+                onButtonSubmit={onSubmit}
+              />
+              <FaceDetection
+                boxes={boxes}
+                url={url}
+                recognitionError={recognitionError}
+                message={message}
+              />
+            </Fragment>
+          )}
+        />
+        <Redirect to='/' />
+      </Fragment>
+    );
+  } else {
+    routes = (
+      <Fragment>
+        <Route exact path='/' Redirect to='/login' />
+        <Route exact path='/register' component={Register} />
+        <Route exact path='/login' component={SignIn} />
+        <Redirect to='/login' />
+      </Fragment>
+    );
+  }
 
   return (
-    <div className='App'>
-      <Particles
-        className='partciles'
-        params={{
-          particles: {
-            number: {
-              value: 100,
-              density: {
-                enable: true,
-                value_area: 800,
+    <AuthContext.Provider
+      value={{
+        isLoggedIn: !!token,
+        token: token,
+        login: login,
+        logout: logout,
+        getUserID: getUserID
+      }}
+    >
+      <div className='App'>
+        <Particles
+          className='partciles'
+          params={{
+            particles: {
+              number: {
+                value: 100,
+                density: {
+                  enable: true,
+                  value_area: 800,
+                },
               },
             },
-          },
-        }}
-      />
-
-      <Navigation onRouteChange={onRouteChange} isSignedIn={isSignedIn} />
-      {route === 'home' ? (
-        <div>
-          <Logo />
-          <Rank userData={userData} />
-          <ImageLinkForm
-            onInputChange={onInputChange}
-            onButtonSubmit={onSubmit}
-          />
-          <FaceDetection
-            boxes={boxes}
-            url={url}
-            recognitionError={recognitionError}
-            message={message}
-          />
-        </div>
-      ) : route === 'signIn' ? (
-        <SignIn
-          onRouteChange={onRouteChange}
-          onChangeHandler={onChangeHandler}
-          onSubmitHandler={onSubmitHandler}
-          error={error}
-          password={password}
-          email={email}
+          }}
         />
-      ) : (
-        <Register onRouteChange={onRouteChange} />
-      )}
-    </div>
+
+        <Router>
+          <Fragment>
+            <Switch>{routes}</Switch>
+          </Fragment>
+        </Router>
+      </div>
+    </AuthContext.Provider>
   );
 }
 
