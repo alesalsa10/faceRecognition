@@ -71,10 +71,10 @@ function App() {
 
   const onSubmit = async () => {
     setUrl(input);
-    app.models.predict(Clarifai.FACE_DETECT_MODEL, input).then(
-      function (response) {
-        let responseObj = response.outputs[0].data;
-
+    let responseObj;
+    await app.models.predict(Clarifai.FACE_DETECT_MODEL, input).then(
+      async function (response) {
+        responseObj = await response.outputs[0].data;
         if (Object.keys(responseObj).length !== 0) {
           displayFaceBox(calculateFaceLocation(response));
           setMessage('');
@@ -89,9 +89,9 @@ function App() {
       }
     );
     try {
-      console.log(token);
+      let faceNumber = responseObj === undefined || responseObj.regions === undefined ? 0: responseObj.regions.length;
       const response = await fetch(
-        'https://infinite-wave-73400.herokuapp.com/' + userID,
+        'https://infinite-wave-73400.herokuapp.com/' + userID + '/' + faceNumber,
         {
           method: 'PUT',
           headers: {
@@ -100,7 +100,7 @@ function App() {
         }
       );
       const updatedUser = await response.json();
-      setUserData({ ...userData, entries: updatedUser.entries });
+      setUserData({ ...userData, count: updatedUser.count }); 
     } catch (err) {
       console.log(err);
     }

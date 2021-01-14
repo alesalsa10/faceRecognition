@@ -22,7 +22,6 @@ export default function Rank() {
         const resData = await res.json();
         auth.getUserID(resData._id)
         setUser(resData);
-        console.log(resData);
       }
     };
     getUserData(auth.token.token);
@@ -36,9 +35,9 @@ export default function Rank() {
   ) : (
     <div>
       <div className={styled.header}>
-        {user.name + ', your current entry count is..'}
+        {user.name + ', you have detected a total of ...'}
       </div>
-      <div className={styled.number}>{user.entries}</div>
+      <div className={styled.number}>{user.count}  faces so far</div>
     </div>
   );
 }

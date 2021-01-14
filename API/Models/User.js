@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     min: 8,
   },
-  entries: {
+  count: {
     type: Number,
     default: 0
   }

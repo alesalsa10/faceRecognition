@@ -1,16 +1,17 @@
 const router = require('express').Router();
 const User = require('../Models/User');
-router.put('/:id', async (req, res) => {
+router.put('/:id/:count', async (req, res) => {
   try {
+    console.log(req.params.count)
     User.findByIdAndUpdate(
       req.params.id,
-      { $inc: { entries: 1 } },
+      { $inc: { count: req.params.count } },
       { new: true },
       function (err, result) {
         if (err) {
           console.log(err);
         }
-        console.log(result.entries);
+        console.log(result);
         res.send(result);
       }
     );

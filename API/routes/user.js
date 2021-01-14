@@ -4,7 +4,7 @@ const User = require('../Models/User');
 router.get('/profile', async (req, res) => {
   try {
     const user = await User.findById(req.user.user.id)
-      .select(['name', 'entries'])
+      .select(['name', 'count'])
 
     if (!user) {
       return res.status(400).send('Server error');
